@@ -67,6 +67,11 @@ class Slack {
         });
     }
 
+    /**
+     * Returns a list of Slack workspace users.
+     * 
+     * See https://slack.com/api/users.list
+     */
     getUsers() {
         return new Promise(async (resolve, reject) => {
             if (this._users.length > 0) {
@@ -88,6 +93,11 @@ class Slack {
         });
     }
 
+    /**
+     * Find user by either email or name.
+     * 
+     * @param {Object} searchProperties 
+     */
     findUser(searchProperties = {}) {
         return new Promise(async (resolve, reject) => {
             try {
@@ -116,10 +126,21 @@ class Slack {
         });
     }
 
-    getUrlWithPayload(endpoint, payload) {
+    /**
+     * Returns URL for POST request.
+     * 
+     * @param {string} endpoint 
+     * @param {object} payload 
+     */
+    getUrlWithPayload(endpoint, payload = {}) {
         return `${endpoint}?${querystring.stringify(payload)}`;
     }
 
+    /**
+     * Returns payload with token attached to the object.
+     * 
+     * @param {object} payload 
+     */
     getNormalizedPayload(payload = {}) {
         return _.assign(payload, {
             token: this._token,

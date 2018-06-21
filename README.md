@@ -20,7 +20,7 @@ const token = 'XXXXXX';
 const slackIntegration = new Slack(token);
 ```
 
-Once, initialized, you can access following methods:
+Once initialized, you can access following methods:
 
 ### send(message: Object): Promise
 This methods allows you send a message in your Slack workspace.
