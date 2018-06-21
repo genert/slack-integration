@@ -1,5 +1,7 @@
 # Slack integration for NodeJS
 
+Package for sending slack messages and retrieving Git repository's user info.
+
 > This package is not compiled to ES5 and therefore requires Promise, and async/await support.
 
 ## Installation
