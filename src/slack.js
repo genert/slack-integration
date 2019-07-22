@@ -84,7 +84,7 @@ class Slack {
 
                 const result = await request.get({ url, json: true });
 
-                if (_.isEmpty(result.members)) return reject(new Error('No users found, check token'));
+                if (_.isEmpty(result.members)) return reject(new Error('No users found.'));
 
                 this._users = result.members;
 
