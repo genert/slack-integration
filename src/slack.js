@@ -82,7 +82,9 @@ class Slack {
                 const payload = this.getNormalizedPayload();
                 const url = this.getUrlWithPayload(SLACK_ENDPOINT_USERS_LIST, payload);
 
-                const result = await request.post({ url, json: true });
+                const result = await request.get({ url, json: true });
+
+                if (_.isEmpty(result.members)) return reject(new Error('No users found.'));
 
                 this._users = result.members;
 
