@@ -1,5 +1,4 @@
 const request = require('request-promise-native');
-const _ = require('lodash');
 const querystring = require('querystring');
 const gitUser = require('./git-user');
 
@@ -9,8 +8,8 @@ const SLACK_ENDPOINT_USERS_LIST = 'https://slack.com/api/users.list';
 class Slack {
     /**
      * Initialize Slack class.
-     * 
-     * @param {string} token 
+     *
+     * @param {string} token
      */
     constructor(token) {
         if (!token) {
@@ -24,8 +23,8 @@ class Slack {
     /**
      * Send Slack message.
      * See https://api.slack.com/methods/chat.postMessage
-     * 
-     * @param {object} message 
+     *
+     * @param {object} message
      */
     send(message = {}) {
         return new Promise(async (resolve, reject) => {
@@ -41,7 +40,7 @@ class Slack {
             const url = this.getUrlWithPayload(SLACK_ENDPOINT_POST_MESSAGE, payload);
 
             try {
-                const result = await request.post({ url, json: true });
+                const result = await request.post({url, json: true});
 
                 resolve(result);
             } catch (err) {
@@ -69,8 +68,8 @@ class Slack {
 
     /**
      * Returns a list of Slack workspace users.
-     * 
-     * See https://slack.com/api/users.list
+     *
+     * See https://api.slack.com/methods/users.list
      */
     getUsers() {
         return new Promise(async (resolve, reject) => {
@@ -82,9 +81,11 @@ class Slack {
                 const payload = this.getNormalizedPayload();
                 const url = this.getUrlWithPayload(SLACK_ENDPOINT_USERS_LIST, payload);
 
-                const result = await request.get({ url, json: true });
+                const result = await request.get({url, json: true});
 
-                if (_.isEmpty(result.members)) return reject(new Error('No users found.'));
+                if (!result.members || result.members.length === 0) {
+                    return reject(new Error('No users found.'));
+                }
 
                 this._users = result.members;
 
@@ -97,8 +98,8 @@ class Slack {
 
     /**
      * Find user by either email or name.
-     * 
-     * @param {Object} searchProperties 
+     *
+     * @param {Object} searchProperties
      */
     findUser(searchProperties = {}) {
         return new Promise(async (resolve, reject) => {
@@ -106,21 +107,21 @@ class Slack {
                 await this.getUsers();
 
                 if (searchProperties.email) {
-                    const match = _.find(this._users, (user) => user.profile.email === searchProperties.email);
-    
+                    const match = this._users.find((user) => user.profile.email === searchProperties.email);
+
                     if (match) {
                         return resolve(match);
                     }
                 }
-    
+
                 if (searchProperties.name) {
-                    const match = _.find(this._users, (user) => user.profile.real_name.toLowerCase() === searchProperties.name.toLowerCase());
-    
+                    const match = this._users.find((user) => user.profile.real_name.toLowerCase() === searchProperties.name.toLowerCase());
+
                     if (match) {
                         return resolve(match);
                     }
                 }
-    
+
                 reject(new Error('No user found.'));
             } catch (err) {
                 reject(err);
@@ -130,9 +131,9 @@ class Slack {
 
     /**
      * Returns URL for POST request.
-     * 
-     * @param {string} endpoint 
-     * @param {object} payload 
+     *
+     * @param {string} endpoint
+     * @param {object} payload
      */
     getUrlWithPayload(endpoint, payload = {}) {
         return `${endpoint}?${querystring.stringify(payload)}`;
@@ -140,11 +141,11 @@ class Slack {
 
     /**
      * Returns payload with token attached to the object.
-     * 
-     * @param {object} payload 
+     *
+     * @param {object} payload
      */
     getNormalizedPayload(payload = {}) {
-        return _.assign(payload, {
+        return Object.assign({}, payload, {
             token: this._token,
         });
     }
